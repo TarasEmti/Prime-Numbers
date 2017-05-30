@@ -12,9 +12,9 @@ class InitialViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var numberInputTextField: UITextField!
     
-    @IBOutlet weak var isPrimeLabel: UILabel!
     @IBOutlet weak var primeNumbersSummLabel: UILabel!
     @IBOutlet weak var primeNumbersList: UITextView!
+    @IBOutlet weak var numbersRange: UILabel!
     
     let stats = PrimeNumbersStats()
     
@@ -22,17 +22,15 @@ class InitialViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         
         viewCustomisation()
-        changeViewStats()
+        changeViewStats(nil)
         
         numberInputTextField.delegate = self
     }
     
     func viewCustomisation() {
         
-        isPrimeLabel.text = "-"
-        isPrimeLabel.textColor = .gray
-        
         primeNumbersSummLabel.textColor = .gray
+        numbersRange.textColor = .gray
         
         primeNumbersList.textColor = .gray
         primeNumbersList.textAlignment = .right
@@ -46,59 +44,39 @@ class InitialViewController: UIViewController, UITextFieldDelegate {
     @IBAction func checkNumber(_ sender: Any) {
         
         guard let numberString = numberInputTextField.text,
-            let number = Int64(numberString) else {
+            let number = Int(numberString) else {
                 
-                showErrorAlert(error: "This number is too big (Int64 limits)")
+                showErrorAlert(error: "This number is too big (Int limits)")
                 return
         }
         
-        if PrimeNumberValidate.isPrimeNumber(number) {
-            
-            stats.addNewPrimeNumber(number)
-            showValidationSuccsess(isPrime: true)
-            changeViewStats()
-            
-        } else {
-            showValidationSuccsess(isPrime: false)
-        }
-        clearNumberField(isError: false)
+        clearStats()
+        PrimeNumberValidate.searchForPrimeNumbers(inRangeTo: number, forStats: stats)
+        changeViewStats(number)
     }
     
-    func showValidationSuccsess(isPrime: Bool) {
+    func changeViewStats(_ number: Int?) {
         
-        if isPrime {
-            
-            isPrimeLabel.text = "YES"
-            isPrimeLabel.textColor = .green
-            
+        clearNumberField()
+        
+        if let number = number {
+            numbersRange.text = "from 1 to \(number)"
         } else {
-            
-            isPrimeLabel.text = "NO"
-            isPrimeLabel.textColor = .red
+            numbersRange.text = "-"
         }
-    }
-    
-    func changeViewStats() {
-        
         primeNumbersSummLabel.text = "\(stats.getSumm())"
         primeNumbersList.text = stats.getList()
     }
     
-    func clearNumberField(isError: Bool) {
+    func clearNumberField() {
         
         numberInputTextField.text = ""
-        
-        if isError {
-            isPrimeLabel.text = "-"
-            isPrimeLabel.textColor = .gray
-        }
     }
     
     func clearStats() {
         
         stats.clear()
-        clearNumberField(isError: true)
-        changeViewStats()
+        changeViewStats(nil)
     }
     
     func showErrorAlert(error: String) {
@@ -110,7 +88,7 @@ class InitialViewController: UIViewController, UITextFieldDelegate {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
                 alert.dismiss(animated: true, completion: {
-                    self.clearNumberField(isError: true)
+                    self.clearNumberField()
                 })
             })
         })

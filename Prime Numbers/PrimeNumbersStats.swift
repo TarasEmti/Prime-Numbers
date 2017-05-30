@@ -10,7 +10,7 @@ import Foundation
 
 class PrimeNumbersStats {
     
-    private var summ: Int64
+    private var summ: Int
     private var list: String
     
     init() {
@@ -18,7 +18,7 @@ class PrimeNumbersStats {
         list = ""
     }
     
-    func addNewPrimeNumber(_ number: Int64) {
+    func addNewPrimeNumber(_ number: Int) {
     
         summ = summ + number
         
@@ -29,7 +29,7 @@ class PrimeNumbersStats {
         }
     }
     
-    func getSumm() -> Int64 {
+    func getSumm() -> Int {
         return summ
     }
     
